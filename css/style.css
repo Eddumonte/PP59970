@@ -21,10 +21,12 @@ nav {
 nav h1 {
     margin: 0;
 }
+
 main{
     background-color: bisque;
     height: 900px;
 }
+
 .section1 {
     display: flex;
     justify-content: space-between;
@@ -68,6 +70,7 @@ main{
     cursor: pointer;
     font-size: 16px;
 }
+
 .libro button:hover {
     background-color: #218838;
 }
@@ -75,6 +78,7 @@ main{
 #carritoLibros{
     display: block;
 }
+
 .carritoLibro{
     display: flex;
     width: 50%;

@@ -40,6 +40,7 @@ libros.forEach((libro) =>{
         <h2>${libro.titulo}</h2>
         <p>$${libro.precio}</p>
     `;
+
     let button = document.createElement("button");
     button.classList.add("libroBoton")
     button.innerText = "Agregar al carrito";
@@ -55,6 +56,7 @@ libros.forEach((libro) =>{
 
 function actualizarCarrito(){
     carritoLibros.innerHTML = "";
+
     if (carrito.length === 0) {
         carritoVacio.classList.remove("d-none");
         carritoLibros.classList.add("d-none")
@@ -82,6 +84,7 @@ function actualizarCarrito(){
             carritoLibros.append(div);
         })
     }
+    
     actualizarTotal();
     localStorage.setItem("carrito", JSON.stringify(carrito));
 }
