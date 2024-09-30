@@ -1,36 +1,100 @@
-*{margin: 0;
+* {
+    box-sizing: border-box;
+    margin: 0;
     padding: 0;
+    font-family: Arial, sans-serif;
 }
-body{
-    background-color: black;
+
+.d-none{
+    display: none;
 }
-.header{
-    width: 100%;
-    height: 50px;
-    background-color: aqua;
-}
-.nav{
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: violet;
-}
-h1{
+
+nav {
+    background-color: #333;
+    height: 40px;
     color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
-.main{
+
+nav h1 {
+    margin: 0;
+}
+main{
+    background-color: bisque;
+    height: 900px;
+}
+.section1 {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.libro {
+    background-color: #333;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 23%;
+    padding: 15px;
+    text-align: center;
+    height: auto;
+    color: #28a745;
+}
+
+.libro img {
     width: 100%;
-    height: 100%;
-    background-color: chocolate;
+    max-height: 180px;
+    object-fit: contain;
+    border-radius: 5px;
 }
-.section1, .section2, .section3, .section4 {
-    width: 25%;
-    height: 10%;
-    display: inline-block;
+
+.libro h2 {
+    font-size: 18px;
+    margin: 10px 0;
 }
-.img{
-    width: 100%;
-    height: 100%;
+
+.libro p {
+    font-size: 16px;
+    margin: 10px 0;
+}
+
+.libro button {
+    padding: 10px 15px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.libro button:hover {
+    background-color: #218838;
+}
+
+#carritoLibros{
+    display: block;
+}
+.carritoLibro{
+    display: flex;
+    width: 50%;
+    border: #333 2px solid;
+    border-radius: 20px;
+    justify-content: space-between;
+}
+
+h3{
+    width: 240px;
+    margin-left: 10px;
+}
+
+.carritoLibro p{
+    font-weight: 600;
+}
+
+.carritoLibroButton{
+    background-color: red;
+    color: white;
+    border-radius: 50px;
+    width: 60px;
 }
