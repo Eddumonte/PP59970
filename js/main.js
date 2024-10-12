@@ -1,116 +1,216 @@
-let libros = [
-    {
-        id: "libro-01",
-        titulo: "El poder de las palabras",
-        precio: 27000,
-        img: "./img/el-poder-de-las-palabras.jpg",
-    },
-    {
-        id: "libro-02",
-        titulo: "Las leyes de la suerte",
-        precio: 35000,
-        img: "./img/las-leyes-de-la-suerte.jpg",
-    },
-    {
-        id: "libro-03",
-        titulo: "Los caballeros de la noche",
-        precio: 15000,
-        img: "./img/los-caballeros-de-la-noche.jpg",
-    },
-    {
-        id: "libro-04",
-        titulo: "Si lo crees lo creas",
-        precio: 25000,
-        img: "./img/si-lo-crees-lo-creas.jpg",
-    },
-]
+let valorMetroCuadrado = 500;
+let manoDeObra = 1.25;
+let riegos = [];
 
-let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-let contenedorLibros = document.querySelector("#libros");
-let carritoVacio = document.querySelector("#carritoVacio");
-let carritoLibros = document.querySelector("#carritoLibros")
-let carritoTotal = document.querySelector("#carritoTotal")
+let form = document.getElementById('formulario');
 
-libros.forEach((libro) =>{
-    let div = document.createElement("div");
-    div.classList.add("libro")
+form.addEventListener('submit', agregarRiego);
 
-    div.innerHTML = `
-        <img src=${libro.img}>
-        <h2>${libro.titulo}</h2>
-        <p>$${libro.precio}</p>
-    `;
+function agregarRiego(event) {
+    event.preventDefault();
 
-    let button = document.createElement("button");
-    button.classList.add("libroBoton")
-    button.innerText = "Agregar al carrito";
+    let formRiego = event.target.children;
 
-    button.addEventListener("click", () =>{
-        agregarAlCarrito(libro);
-    })
+    let seleccionCuotas = document.getElementsByClassName('opcionCuotas_lista')[0];
+    let valorCuota = seleccionCuotas.value;
 
-    div.append(button);
+    let medidasRiego = {
+        largo: formRiego[0].value,
+        ancho: formRiego[1].value,
+        area: formRiego[0].value * formRiego[1].value,
+        precio: ((formRiego[0].value * formRiego[1].value) + valorMetroCuadrado) * manoDeObra,
+        precioEnCuotas: (((formRiego[0].value * formRiego[1].value) + valorMetroCuadrado) * manoDeObra) / valorCuota
+    }
 
-    contenedorLibros.append(div)
-})
+    if (Number(formRiego[0].value) && Number(formRiego[1].value)) {
+        let nuevoRiego = document.createElement('li');
+        nuevoRiego.innerText = `Largo: ${medidasRiego.largo}Mts. - Ancho: ${medidasRiego.ancho}Mts. - Area: ${medidasRiego.area}M2. - Precio: $${medidasRiego.precio.toFixed(2)}Ars. - Precio en cuotas: $${medidasRiego.precioEnCuotas.toFixed(2)}Ars en ${valorCuota} cuota/s.`;
+    
+        document.querySelector('#riegos').append(nuevoRiego);
+        riegos.push(medidasRiego);
+        document.getElementById('borrar').click();
+        Toastify({
+            text: '¡Felicidades, cotizaste un nuevo riego!',
+            duration: 3000,
+            style: {
+                background: 'rgb(65, 152, 7)',
+                fontFamily: 'sans-serif',
+                borderRadius: '10px'
+            }
+        }).showToast();
+    }
+}
 
-function actualizarCarrito(){
-    carritoLibros.innerHTML = "";
+let btnGuardarRiegos = document.getElementById('guardarRiegos');
 
-    if (carrito.length === 0) {
-        carritoVacio.classList.remove("d-none");
-        carritoLibros.classList.add("d-none")
-    } else {
-        carritoVacio.classList.add("d-none")
-        carritoLibros.classList.remove("d-none")
+btnGuardarRiegos.onclick = ()=>{
+    if (riegos.length > 0) {
 
-        carrito.forEach((libro) => {
-            let div = document.createElement("div");
-            div.classList.add("carritoLibro");
-            div.innerHTML= `
-                <h3>${libro.titulo}</h3>
-                <p>$${libro.precio}</p>
-                <p>Cant: ${libro.cantidad}</p>
-                <p>subt: $${libro.precio * libro.cantidad}</p>
-            `;
+        sessionStorage.setItem('listaRiegos', JSON.stringify(riegos));
 
-            let button = document.createElement("button");
-            button.classList.add("carritoLibroButton");
-            button.innerText = "Eliminar";
-            button.addEventListener("click", () => {
-                borrarDelCarrito(libro);
-            });
-            div.append(button);
-            carritoLibros.append(div);
-        })
+        Toastify ({
+            text: '¡Guardado exitosamente!',
+            duration: 1500,
+            style: {
+                background: 'rgb(65, 152, 7)',
+                fontFamily: 'sans-serif',
+                borderRadius: '10px'
+            }
+        }).showToast();
+    }
+}
+
+let btnBorrarUltimo = document.getElementById('borrarUltimo');
+
+btnBorrarUltimo.onclick = ()=>{
+    if (riegos.length > 0) {
+        Swal.fire({
+            title: 'Atención',
+            text: 'Estas seguro que deseas borrar el ultimo riego?',
+            icon: 'warning',
+            confirmButtonText: 'Sí',
+            showDenyButton: true,
+            denyButtonText: 'No'
+        }).then((result) => {
+                if(result.isConfirmed) {
+                    riegos.pop();
+                    actualizarLista();
+
+                    Toastify({
+                        text: '¡Riego borrado!',
+                        duration: 2000,
+                        style: {
+                            background: 'rgb(220, 63, 63)',
+                            fontFamily: 'sans-serif',
+                            borderRadius: '10px'
+                        }
+                    }).showToast();
+                    }
+                }
+            )
+    }
+}
+
+function actualizarLista() {
+    let listaRiegos = document.querySelector('#riegos');
+    listaRiegos.innerHTML = '';
+
+    let seleccionCuotas = document.getElementsByClassName('opcionCuotas_lista')[0];
+    let valorCuota = seleccionCuotas.value; 
+
+    riegos.forEach((medidaRiego) => {
+        medidaRiego.precioEnCuotas = (((parseFloat(medidaRiego.largo) * parseFloat(medidaRiego.ancho)) + valorMetroCuadrado) * manoDeObra) / valorCuota;
+
+        let nuevoRiego = document.createElement('li');
+        nuevoRiego.innerText = `Largo: ${medidaRiego.largo}Mts. - Ancho: ${medidaRiego.ancho}Mts. - Area: ${medidaRiego.area}M2. - Precio: $${medidaRiego.precio.toFixed(2)}Ars. - Precio en cuotas: $${medidaRiego.precioEnCuotas.toFixed(2)}Ars en ${valorCuota} cuotas.`;
+        listaRiegos.append(nuevoRiego);
+    });
+}
+
+
+
+let cliente = [];
+
+function agregarClienteAlLocalStorage(datosCliente) {
+    let listaClientes = JSON.parse(localStorage.getItem('listaClientes')) || [];
+    
+    if (!Array.isArray(listaClientes)) {
+        listaClientes = [];
+    }
+
+    function clienteExiste(clienteNuevo, listaClientes) {
+        return listaClientes.some(function (clienteExistente) {
+            return (
+                clienteExistente.nombreCliente === clienteNuevo.nombreCliente &&
+                clienteExistente.apellidoCliente === clienteNuevo.apellidoCliente &&
+                clienteExistente.telefonoCliente === clienteNuevo.telefonoCliente &&
+                clienteExistente.mailCliente === clienteNuevo.mailCliente
+            );
+        });
     }
     
-    actualizarTotal();
-    localStorage.setItem("carrito", JSON.stringify(carrito));
-}
-
-function agregarAlCarrito(libro) {
-    let itemEncontrado = carrito.find((item) => item.id === libro.id)
-
-    if(itemEncontrado) {
-        itemEncontrado.cantidad++;
-    } else{
-        carrito.push({...libro, cantidad: 1});
+    if (clienteExiste(datosCliente, listaClientes)) {
+        Swal.fire({
+            title: '¡Cliente Existente!',
+            text: 'El cliente ya se encuentra en nuestra base de datos.',
+            icon: 'info',
+            confirmButtonText: 'OK'
+        });
+    } else {
+        listaClientes.push(datosCliente);
+        localStorage.setItem('listaClientes', JSON.stringify(listaClientes));
+        Swal.fire({
+            title: '¡Cliente registrado!',
+            text: 'El cliente ha sido registrado con éxito. En breve nos pondremos en contacto contigo.',
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
+        enviarMail(datosCliente);
+        
+        document.getElementById('borrarDatosPersonales').click();
     }
-
-    actualizarCarrito()
 }
 
-function borrarDelCarrito(libro){
-    let indice = carrito.findIndex((item) => item.id === libro.id)
-    carrito.splice(indice, 1);
+let formCliente = document.getElementById('formDatosPersonales');
 
-    actualizarCarrito();
-}
+formCliente.addEventListener('submit', function (event) {
+    event.preventDefault();
 
-function actualizarTotal (){
-    let total = carrito.reduce((acc, libro) => acc + (libro.precio * libro.cantidad), 0);
-    carritoTotal.innerText = `$${total}`;
-}
+    const datosFormulario = {};
+    const inputs = document.querySelectorAll('.formDatosPersonales_inputs input');
 
-actualizarCarrito();
+    inputs.forEach(input => {
+        datosFormulario[input.id] = input.value;
+    });
+
+    agregarClienteAlLocalStorage(datosFormulario);  
+});
+
+emailjs.init("eyPu-i_puaahmtEzd");
+
+function enviarMail(datosFormulario) {
+    const emailRemitente = datosFormulario.mailCliente;
+    const emailDestinatario = 'tomi.besso12@gmail.com';
+    const mensaje = datosFormulario.mensajeCliente;
+    const nombre = datosFormulario.nombreCliente;
+    const apellido = datosFormulario.apellidoCliente;
+    const telefono = datosFormulario.telefonoCliente;
+
+    const datosMail = {
+        service_id: 'service_p2rb67d',
+        template_id: 'contact_form',
+        user_id: 'eyPu-i_puaahmtEzd',
+        template_params: {
+            from_email: emailRemitente,
+            to_email: emailDestinatario,
+            mensaje: mensaje,
+            nombre: nombre,
+            apellido: apellido,
+            telefono: telefono,
+            riegos: riegos  
+        }
+    };
+
+    fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(datosMail)
+    })
+        .then(response => {
+            if (response.ok) {
+            console.log(response);
+            } else {
+                console.log("Error al enviar el mail");
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                title: 'Error',
+                text: 'Hubo un problema al enviar el correo. Por favor, inténtalo nuevamente.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        });
+    }
